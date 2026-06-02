@@ -1,0 +1,9 @@
+type: object
+description: |
+  必須パラメータの欠落など、リクエスト記述の不備で返る JSON 形式のエラー。
+required:
+  - message
+properties:
+  message:
+    type: string
+    description: 'エラーメッセージ。例 "Missing required request parameters: [typeNames]"。'

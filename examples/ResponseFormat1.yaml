@@ -1,0 +1,41 @@
+type: FeatureCollection
+features:
+  - type: Feature
+    id: t_travospublic_measure_5m.4693500.202502100900
+    geometry:
+      type: MultiPoint
+      coordinates:
+        - - 139.203293
+          - 35.37445003
+    geometry_name: ジオメトリ
+    properties:
+      "地方整備局等番号": 83
+      "開発建設部／都道府県コード": ""
+      "常時観測点コード": 3110640
+      "収集時間フラグ（5分間／1時間）": "1"
+      "観測年月日": 20250210
+      "時間帯": 900
+      "上り・小型交通量": 42
+      "上り・大型交通量": 5
+      "上り・車種判別不能交通量": 1
+      "上り・停電": "0"
+      "上り・ループ異常": "0"
+      "上り・超音波異常": "0"
+      "上り・欠測": "0"
+      "下り・小型交通量": 39
+      "下り・大型交通量": 6
+      "下り・車種判別不能交通量": 3
+      "下り・停電": "0"
+      "下り・ループ異常": "0"
+      "下り・超音波異常": "0"
+      "下り・欠測": "0"
+      "道路種別": "3"
+      "時間コード": 202502100900
+totalFeatures: 1
+numberMatched: 1
+numberReturned: 1
+timeStamp: "2025-03-26T10:20:44.761Z"
+crs:
+  type: name
+  properties:
+    name: "urn:ogc:def:crs:EPSG::4326"

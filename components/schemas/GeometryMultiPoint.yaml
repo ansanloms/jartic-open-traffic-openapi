@@ -1,0 +1,22 @@
+type: object
+description: 観測地点の位置情報。GeoJSON の MultiPoint 形式。
+required:
+  - type
+  - coordinates
+properties:
+  type:
+    type: string
+    const: MultiPoint
+    description: ジオメトリオブジェクトタイプ。固定値 "MultiPoint"。
+  coordinates:
+    type: array
+    description: 観測地点を描画するための緯度経度の組合せ。各要素は[経度、 緯度]。
+    items:
+      type: array
+      minItems: 2
+      maxItems: 2
+      items:
+        type: number
+      example:
+        - 139.203293
+        - 35.37445003

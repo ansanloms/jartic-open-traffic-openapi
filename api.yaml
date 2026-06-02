@@ -1,37 +1,42 @@
 openapi: 3.1.0
 info:
-  version: 0.0.1
-  title: OpenAPI Example
+  version: 1.0.0
+  title: 国土交通省 交通量 API（JARTIC）
   description:
     $ref: ./README.md
 servers:
-  - url: https://api.example.org
-    description: Production Server
+  - url: https://api.jartic-open-traffic.org
+    description: 本番環境。
 paths:
-  /users:
-    $ref: ./paths/users.yaml
-  /users/{id}:
-    $ref: ./paths/users.{id}.yaml
+  /geoserver:
+    $ref: ./paths/geoserver.yaml
 components:
   schemas:
-    User:
-      $ref: ./components/schemas/User.yaml
-    EnumStatus:
-      $ref: ./components/schemas/EnumStatus.yaml
-    RequestPostUsers:
-      $ref: ./components/schemas/RequestPostUsers.yaml
-    RequestPutUserId:
-      $ref: ./components/schemas/RequestPutUserId.yaml
-    ResponseError:
-      $ref: ./components/schemas/ResponseError.yaml
-    ResponseGetUsers:
-      $ref: ./components/schemas/ResponseGetUsers.yaml
-    ResponseGetUsersId:
-      $ref: ./components/schemas/ResponseGetUsersId.yaml
-  securitySchemes:
-    bearerAuth:
-      type: http
-      scheme: bearer
-      bearerFormat: JWT
-security:
-  - bearerAuth: []
+    Crs:
+      $ref: ./components/schemas/Crs.yaml
+    Feature:
+      $ref: ./components/schemas/Feature.yaml
+    GeometryMultiPoint:
+      $ref: ./components/schemas/GeometryMultiPoint.yaml
+    PropertiesBase:
+      $ref: ./components/schemas/PropertiesBase.yaml
+    PropertiesFormat1:
+      $ref: ./components/schemas/PropertiesFormat1.yaml
+    PropertiesFormat2:
+      $ref: ./components/schemas/PropertiesFormat2.yaml
+    PropertiesFormat3:
+      $ref: ./components/schemas/PropertiesFormat3.yaml
+    PropertiesFormat4:
+      $ref: ./components/schemas/PropertiesFormat4.yaml
+    EnumRoadType:
+      $ref: ./components/schemas/EnumRoadType.yaml
+    EnumTypeNames:
+      $ref: ./components/schemas/EnumTypeNames.yaml
+    ResponseErrorLambda:
+      $ref: ./components/schemas/ResponseErrorLambda.yaml
+    ResponseErrorMessage:
+      $ref: ./components/schemas/ResponseErrorMessage.yaml
+    ResponseExceptionReport:
+      $ref: ./components/schemas/ResponseExceptionReport.yaml
+    ResponseFeatureCollection:
+      $ref: ./components/schemas/ResponseFeatureCollection.yaml

@@ -1,0 +1,16 @@
+type: object
+description: |
+  レスポンスのペイロードサイズ超過などで返る JSON 形式のエラー（基盤の Lambda 由来）。
+  期間や範囲を狭めて再リクエストする必要がある。
+required:
+  - errorMessage
+  - errorType
+properties:
+  errorMessage:
+    type: string
+    description: |
+      エラーメッセージ。
+      例 "Response payload size exceeded maximum allowed payload size (6291556 bytes)."。
+  errorType:
+    type: string
+    description: エラー種別。例 "Function.ResponseSizeTooLarge"。

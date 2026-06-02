@@ -1,0 +1,148 @@
+get:
+  operationId: getFeature
+  summary: 交通量データの取得（WFS GetFeature）。
+  tags:
+    - traffic
+  description:
+    $ref: ./descriptions/getFeature.md
+  parameters:
+    - in: query
+      name: service
+      required: true
+      description: '"WFS" を指定する。'
+      schema:
+        type: string
+        enum:
+          - WFS
+    - in: query
+      name: version
+      required: true
+      description: '"2.0.0" を指定する。'
+      schema:
+        type: string
+        enum:
+          - "2.0.0"
+    - in: query
+      name: request
+      required: true
+      description: '"GetFeature" を指定する。'
+      schema:
+        type: string
+        enum:
+          - GetFeature
+    - in: query
+      name: typeNames
+      required: true
+      description: レイヤ名（様式）を指定する。半角カンマ区切りで複数指定も可能。
+      schema:
+        $ref: ../components/schemas/EnumTypeNames.yaml
+    - in: query
+      name: srsName
+      required: true
+      description: '"EPSG:4326"（世界測地系）を指定する。'
+      schema:
+        type: string
+        enum:
+          - "EPSG:4326"
+    - in: query
+      name: outputFormat
+      required: true
+      description: |
+        レスポンスの形式を指定する。
+        "application/json" を指定した場合は GeoJSON 形式、"csv" を指定した場合は CSV 形式となる。
+        本仕様書では "application/json"（GeoJSON）のレスポンスを定義する。
+      schema:
+        type: string
+        enum:
+          - application/json
+          - csv
+    - in: query
+      name: exceptions
+      required: false
+      description: |
+        エラーレスポンスの形式を指定する。
+        "application/json" を指定した場合は JSON 形式、未指定時は XML 形式となる。
+      schema:
+        type: string
+        enum:
+          - application/json
+    - in: query
+      name: cql_filter
+      required: true
+      description: |
+        CQL フィルタ。次の項目を AND 条件で連結して指定する。
+        道路種別（必須）は高速自動車国道なら 1、一般国道なら 3 を `"道路種別"='3'` の形式で指定する。
+        時間コード（必須）は `"時間コード"=YYYYMMDDhhmm` で指定する。範囲指定は `"時間コード">=... AND "時間コード"<=...` の形式とする。5 分値は分を 5 の倍数へ切り捨てる。1 時間値は分を 00 へ切り捨てる。
+        座標指定（任意）は BBOX 関数で緯度経度の範囲を絞り込む。書式は下部の例を参照する。
+        常時観測点コード（任意）は `"常時観測点コード"=01234567` のように 0 埋めで指定する。
+      schema:
+        type: string
+        example: >-
+          "道路種別"='3' AND "時間コード"=202502100900 AND
+          BBOX("ジオメトリ",139.15,35.141,139.32,35.56,'EPSG:4326')
+  responses:
+    "200":
+      description: |
+        処理成功時。GeoJSON FeatureCollection を返す。
+        合致する計測箇所が存在しない場合も 200 で返り、features は空配列となる。
+      content:
+        application/json:
+          schema:
+            $ref: ../components/schemas/ResponseFeatureCollection.yaml
+          examples:
+            format1:
+              summary: 様式 1（常設トラカン 5 分間交通量）
+              value:
+                $ref: ../examples/ResponseFormat1.yaml
+            format2:
+              summary: 様式 2（常設トラカン 1 時間交通量）
+              value:
+                $ref: ../examples/ResponseFormat2.yaml
+            format3:
+              summary: 様式 3（CCTV トラカン 5 分間交通量）
+              value:
+                $ref: ../examples/ResponseFormat3.yaml
+            format4:
+              summary: 様式 4（CCTV トラカン 1 時間交通量）
+              value:
+                $ref: ../examples/ResponseFormat4.yaml
+            empty:
+              summary: 合致 0 件。
+              value:
+                $ref: ../examples/ResponseFeatureCollectionEmpty.yaml
+    default:
+      description: |
+        エラー時のレスポンス。複数の形式がある。HTTP ステータスコードは形式により異なる。
+        必須パラメータの欠落は HTTP 400 で `{message}` を返す。
+        `exceptions=application/json` 指定時の WFS 例外は `{version, exceptions}` を返す（HTTP 200 のことがある）。
+        `exceptions` 未指定時は XML の ExceptionReport を返す。
+        ペイロードサイズ超過時は `{errorMessage, errorType}` を返す。
+      content:
+        application/json:
+          schema:
+            oneOf:
+              - $ref: ../components/schemas/ResponseErrorMessage.yaml
+              - $ref: ../components/schemas/ResponseExceptionReport.yaml
+              - $ref: ../components/schemas/ResponseErrorLambda.yaml
+          examples:
+            missingParameter:
+              summary: 必須パラメータ欠落（HTTP 400）。
+              value:
+                $ref: ../examples/ResponseErrorMessage.yaml
+            exceptionJson:
+              summary: WFS 例外（exceptions=application/json 指定時）。
+              value:
+                $ref: ../examples/ResponseExceptionReport.yaml
+            payloadTooLarge:
+              summary: ペイロードサイズ超過。
+              value:
+                $ref: ../examples/ResponseErrorLambda.yaml
+        text/xml:
+          schema:
+            type: string
+            description: WFS の ExceptionReport（XML）。exceptions 未指定時に返る。
+          examples:
+            exceptionReport:
+              summary: データ種別の記述不正。
+              value: |
+                <?xml version="1.0" encoding="UTF-8"?><ows:ExceptionReport xmlns:ows="http://www.opengis.net/ows/1.1" version="2.0.0"><ows:Exception exceptionCode="InvalidParameterValue" locator="typeName"><ows:ExceptionText>Feature type :t_travospublic_measure_50m unknown</ows:ExceptionText></ows:Exception></ows:ExceptionReport>

@@ -1,0 +1,28 @@
+type: object
+description: 取得結果 1 件分のフィーチャ。計測箇所の位置情報と交通量データの組。
+required:
+  - type
+  - geometry
+  - geometry_name
+  - properties
+properties:
+  type:
+    type: string
+    const: Feature
+    description: 属性項目タイプ。固定値 "Feature"。
+  id:
+    type: string
+    description: '「情報種別名.一意識別子」形式の ID。例 "t_travospublic_measure_5m.4693500.202502100900"。'
+  geometry:
+    $ref: ./GeometryMultiPoint.yaml
+  geometry_name:
+    type: string
+    const: ジオメトリ
+    description: ジオメトリ属性名。固定値 "ジオメトリ"。
+  properties:
+    description: 交通量データ。指定した様式（typeNames）により項目が異なる。
+    oneOf:
+      - $ref: ./PropertiesFormat1.yaml
+      - $ref: ./PropertiesFormat2.yaml
+      - $ref: ./PropertiesFormat3.yaml
+      - $ref: ./PropertiesFormat4.yaml

@@ -1,0 +1,55 @@
+allOf:
+  - $ref: ./PropertiesBase.yaml
+  - type: object
+    description: 様式 1（常設トラカン 5 分間交通量）固有の属性。
+    properties:
+      "上り・小型交通量":
+        type: [integer, "null"]
+        description: 単位:台／5 分。欠測の場合は null。
+      "上り・大型交通量":
+        type: [integer, "null"]
+        description: 単位:台／5 分。欠測の場合は null。
+      "上り・車種判別不能交通量":
+        type: [integer, "null"]
+        description: 単位:台／5 分。欠測の場合は null。
+      "上り・停電":
+        type: string
+        enum: ["0", "1"]
+        description: 0:正常、1:停電。
+      "上り・ループ異常":
+        type: string
+        enum: ["0", "1"]
+        description: 0:正常、1:異常。
+      "上り・超音波異常":
+        type: string
+        enum: ["0", "1"]
+        description: 0:正常、1:異常。
+      "上り・欠測":
+        type: string
+        enum: ["0", "1"]
+        description: 0:正常、1:欠測。
+      "下り・小型交通量":
+        type: [integer, "null"]
+        description: 単位:台／5 分。欠測の場合は null。
+      "下り・大型交通量":
+        type: [integer, "null"]
+        description: 単位:台／5 分。欠測の場合は null。
+      "下り・車種判別不能交通量":
+        type: [integer, "null"]
+        description: 単位:台／5 分。欠測の場合は null。
+      "下り・停電":
+        type: string
+        enum: ["0", "1"]
+        description: 0:正常、1:停電。
+      "下り・ループ異常":
+        type: string
+        enum: ["0", "1"]
+        description: 0:正常、1:異常。
+      "下り・超音波異常":
+        type: string
+        enum: ["0", "1"]
+        description: 0:正常、1:異常。
+      "下り・欠測":
+        type: string
+        enum: ["0", "1"]
+        description: 0:正常、1:欠測。
