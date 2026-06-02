@@ -1,0 +1,20 @@
+type: object
+description: 座標参照系（CRS）の情報。
+required:
+  - type
+  - properties
+properties:
+  type:
+    type: string
+    const: name
+    description: 座標参照系項目タイプ。固定値 "name"。
+  properties:
+    type: object
+    description: CRS のプロパティ。
+    required:
+      - name
+    properties:
+      name:
+        type: string
+        const: "urn:ogc:def:crs:EPSG::4326"
+        description: 座標参照系名称。固定値 "urn:ogc:def:crs:EPSG::4326"。

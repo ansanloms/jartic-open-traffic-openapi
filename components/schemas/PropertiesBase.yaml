@@ -1,0 +1,34 @@
+type: object
+description: 全様式に共通する交通量データの属性。
+properties:
+  "地方整備局等番号":
+    type: integer
+    description: |
+      81:北海道、82:東北、83:関東、84:北陸、85:中部、86:近畿、87:中国、88:四国、89:九州、90:沖縄。
+  "開発建設部／都道府県コード":
+    type: string
+    description: |
+      北海道・中部以外は空欄。
+      北海道は 01:札幌、02:函館、03:小樽、04:旭川、05:室蘭、06:釧路、07:帯広、08:網走、09:留萌、10:稚内。
+      中部は 21:岐阜県、22:静岡県、23:愛知県、24:三重県。
+  "常時観測点コード":
+    type: integer
+    description: 常時観測点コード。
+  "収集時間フラグ（5分間／1時間）":
+    type: string
+    enum:
+      - "1"
+      - "2"
+    description: 1:5 分間、2:1 時間。
+  "観測年月日":
+    type: integer
+    description: YYYYMMDD で表記。
+  "時間帯":
+    type: integer
+    description: 観測時刻を表す。様式 1〜3 は hhmm 形式で返す。様式 4 は時のみで 0〜23 の値となる。
+  "道路種別":
+    $ref: ./EnumRoadType.yaml
+  "時間コード":
+    type: integer
+    format: int64
+    description: 観測年月日+時間帯（YYYYMMDDhhmm）。

@@ -1,0 +1,39 @@
+type: object
+description: |
+  WFS GetFeature のレスポンス。GeoJSON FeatureCollection 形式。
+  リクエストに合致する計測箇所が存在しない場合も HTTP 200 で返り、features は空配列、crs は null となる。
+required:
+  - type
+  - features
+  - totalFeatures
+  - numberMatched
+  - numberReturned
+  - timeStamp
+properties:
+  type:
+    type: string
+    const: FeatureCollection
+    description: GeoJSON オブジェクトタイプ。固定値 "FeatureCollection"。
+  features:
+    type: array
+    description: 取得した結果（n 件）を格納する。
+    items:
+      $ref: ./Feature.yaml
+  totalFeatures:
+    type: integer
+    description: レスポンス対象となったデータのシステム管理用件数。
+  numberMatched:
+    type: integer
+    description: リクエストに一致した件数。
+  numberReturned:
+    type: integer
+    description: 返却した件数。計測箇所および交通量データ一式を 1 としてカウントする。
+  timeStamp:
+    type: string
+    format: date-time
+    description: リクエストを処理した日時。
+  crs:
+    description: 座標参照系。合致する計測箇所が存在しない場合は null。
+    oneOf:
+      - $ref: ./Crs.yaml
+      - type: "null"
