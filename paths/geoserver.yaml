@@ -1,10 +1,10 @@
 get:
-  operationId: getFeature
+  operationId: getGeoserver
   summary: 交通量データの取得（WFS GetFeature）。
   tags:
     - traffic
   description:
-    $ref: ./descriptions/getFeature.md
+    $ref: ./descriptions/getGeoserver.md
   parameters:
     - in: query
       name: service
@@ -93,23 +93,23 @@ get:
             format1:
               summary: 様式 1（常設トラカン 5 分間交通量）
               value:
-                $ref: ../examples/ResponseFormat1.yaml
+                $ref: ../examples/ResponseFeatureCollection/Format1.yaml
             format2:
               summary: 様式 2（常設トラカン 1 時間交通量）
               value:
-                $ref: ../examples/ResponseFormat2.yaml
+                $ref: ../examples/ResponseFeatureCollection/Format2.yaml
             format3:
               summary: 様式 3（CCTV トラカン 5 分間交通量）
               value:
-                $ref: ../examples/ResponseFormat3.yaml
+                $ref: ../examples/ResponseFeatureCollection/Format3.yaml
             format4:
               summary: 様式 4（CCTV トラカン 1 時間交通量）
               value:
-                $ref: ../examples/ResponseFormat4.yaml
+                $ref: ../examples/ResponseFeatureCollection/Format4.yaml
             empty:
               summary: 合致 0 件。
               value:
-                $ref: ../examples/ResponseFeatureCollectionEmpty.yaml
+                $ref: ../examples/ResponseFeatureCollection/Empty.yaml
     default:
       description: |
         エラー時のレスポンス。複数の形式がある。HTTP ステータスコードは形式により異なる。
@@ -128,15 +128,15 @@ get:
             missingParameter:
               summary: 必須パラメータ欠落（HTTP 400）。
               value:
-                $ref: ../examples/ResponseErrorMessage.yaml
+                $ref: ../examples/ResponseErrorMessage/default.yaml
             exceptionJson:
               summary: WFS 例外（exceptions=application/json 指定時）。
               value:
-                $ref: ../examples/ResponseExceptionReport.yaml
+                $ref: ../examples/ResponseExceptionReport/default.yaml
             payloadTooLarge:
               summary: ペイロードサイズ超過。
               value:
-                $ref: ../examples/ResponseErrorLambda.yaml
+                $ref: ../examples/ResponseErrorLambda/default.yaml
         text/xml:
           schema:
             type: string
