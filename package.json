@@ -19,7 +19,6 @@
     "build:vite": "vite build",
     "build:bundle": "redocly bundle ./api.yaml --config ./redocly.yaml --ext yaml --output ./dist/api.yaml",
     "sort": "node ./bin/sort.ts",
-    "search": "node ./bin/search.ts",
     "start": "vite preview --port 4000",
     "dev": "vite"
   },
