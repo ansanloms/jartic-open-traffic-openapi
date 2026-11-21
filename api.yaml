@@ -1,0 +1,960 @@
+openapi: 3.1.0
+info:
+  version: 1.0.0
+  title: 国土交通省 交通量 API（JARTIC）
+  description: |
+    # jartic-open-traffic-openapi
+
+    国土交通省交通量 API（JARTIC が提供する交通量データのオープン化 API）の非公式 OpenAPI 定義。
+
+    常設型トラフィックカウンターおよび CCTV 映像を活用した AI 型トラフィックカウンターで観測された、全国の方向別交通量データを取得する API を記述する。実体は GeoServer の WFS 2.0.0 `GetFeature` であり、エンドポイントは 1 本のみ。取得する様式（データ種別）は `typeNames` の値で切り替える。
+
+    ## 様式
+
+    | 様式  | typeNames                       | 観測機器     | 集計単位    | 検索可能期間 |
+    | ----- | ------------------------------- | ------------ | ----------- | ------------ |
+    | 様式1 | `t_travospublic_measure_5m`     | 常設トラカン | 5分間交通量 | 過去1か月分  |
+    | 様式2 | `t_travospublic_measure_1h`     | 常設トラカン | 1時間交通量 | 過去3か月分  |
+    | 様式3 | `t_travospublic_measure_5m_img` | CCTVトラカン | 5分間交通量 | 過去1か月分  |
+    | 様式4 | `t_travospublic_measure_1h_img` | CCTVトラカン | 1時間交通量 | 過去3か月分  |
+
+    ## 出典
+
+    - ガイダンスサイト: <https://www.jartic-open-traffic.org/>
+    - 交通量 API 仕様書（API リクエストの作成方法）令和 8 年 1 月版
+    - 交通量データ利用の手引き令和 7 年 5 月版
+
+    ## 留意事項
+
+    - この定義は上記の公開資料を基に作成した非公式のものであり、国土交通省・JARTIC が公開・保証するものではない。
+    - `cql_filter` は CQL 文字列であり、OpenAPI の型では内部文法（道路種別・時間コード・BBOX）を強制できない。`getGeoserver` の説明および例を参照すること。
+    - 仕様書の API 概要表には「認証方式有」と記載があるが、リクエストに認証情報を渡すパラメータの記載がなく、例示 URL も無認証であるため、本定義では `securitySchemes` を定義していない。
+    - `outputFormat` は `application/json`（GeoJSON）と `csv` を取り得るが、本定義ではレスポンスを GeoJSON のみ記述する。
+    - 提供されるデータは正式な交通量の調査結果ではなく、精度が変動する場合がある。利用には「交通量 API 利用規約」への事前同意が必要。
+
+    ## 開発
+
+    - `.node-version` に書かれたバージョンの Node が必要。
+    - `npm ci`: 依存を入れる。
+    - `npm run lint`: 型検査、oxlint と oxfmt、textlint、redocly lint を順に実行する。
+    - `npm test`: `bin/` 配下のスクリプトのテストを実行する。
+    - `npm run fix`: sort と textlint、oxlint、oxfmt の各 fixer を順に実行して最後に lint する (途中で失敗しても続行)。
+    - `npm run build`: `dist/` に静的サイト (`index.html`、`assets/` 配下の JS・CSS、`api.yaml`、同梱した依存のライセンス一覧 `licenses.md`) を出力する。
+    - `npm run dev`: spec を bundle せずに Vite の dev サーバを `http://localhost:4000` で起動する。spec のファイルを編集するとブラウザが再読み込みされる。
+
+    依存は `.npmrc` により正確な版で固定する。自前の 2 パッケージ (textlint-plugin-yaml-keys、redocly-plugins) は GitHub のタグを git 依存で参照しており、Dependabot が更新しないため `package.json` のタグを手で書き換えて `npm install` する。
+servers:
+  - url: https://api.jartic-open-traffic.org
+    description: 本番環境。
+paths:
+  /geoserver:
+    get:
+      operationId: getGeoserver
+      summary: 交通量データの取得（WFS GetFeature）。
+      tags:
+        - traffic
+      description: |
+        常設型トラフィックカウンターおよび CCTV 映像を活用した AI 型トラフィックカウンターで観測された、全国の方向別交通量データを取得する。
+
+        実体は GeoServer の WFS 2.0.0 `GetFeature` であり、エンドポイントは 1 本のみ。取得する様式（データ種別）は `typeNames` の値で切り替える。
+
+        ## 様式（typeNames）
+
+        | 様式  | typeNames                       | 観測機器     | 集計単位    | 検索可能期間 |
+        | ----- | ------------------------------- | ------------ | ----------- | ------------ |
+        | 様式1 | `t_travospublic_measure_5m`     | 常設トラカン | 5分間交通量 | 過去1か月分  |
+        | 様式2 | `t_travospublic_measure_1h`     | 常設トラカン | 1時間交通量 | 過去3か月分  |
+        | 様式3 | `t_travospublic_measure_5m_img` | CCTVトラカン | 5分間交通量 | 過去1か月分  |
+        | 様式4 | `t_travospublic_measure_1h_img` | CCTVトラカン | 1時間交通量 | 過去3か月分  |
+
+        `features[].properties` の項目は様式により異なる。様式 1・2 はループ／超音波などの機器状態フラグを、様式 3・4 はカメラや映像解析に関する状態フラグを持つ。
+
+        ## リクエスト例
+
+        ```
+        https://api.jartic-open-traffic.org/geoserver?service=WFS&version=2.0.0&request=GetFeature&typeNames=t_travospublic_measure_5m&srsName=EPSG:4326&outputFormat=application/json&exceptions=application/json&cql_filter=道路種別=3 AND 時間コード=202502100900 AND BBOX(ジオメトリ,139.15,35.141,139.32,35.56,'EPSG:4326')
+        ```
+
+        ## 注意事項
+
+        - 各種トラカンは観測条件により精度が大きく変動する場合がある。本データには気象状況等の環境要因や機器故障等により正確でないデータが含まれることがあり、国土交通省による正式な交通量の調査結果ではない。職員によるデータチェックは実施していない。
+        - 近畿地方整備局の管轄エリアにおける CCTV トラカンの観測値は、システム上の都合により当面は様式 3（5 分間交通量）のみの提供となる。
+        - 本 API の利用には「交通量 API 利用規約」への事前同意が必要。
+      parameters:
+        - in: query
+          name: service
+          required: true
+          description: '"WFS" を指定する。'
+          schema:
+            type: string
+            enum:
+              - WFS
+        - in: query
+          name: version
+          required: true
+          description: '"2.0.0" を指定する。'
+          schema:
+            type: string
+            enum:
+              - 2.0.0
+        - in: query
+          name: request
+          required: true
+          description: '"GetFeature" を指定する。'
+          schema:
+            type: string
+            enum:
+              - GetFeature
+        - in: query
+          name: typeNames
+          required: true
+          description: レイヤ名（様式）を指定する。半角カンマ区切りで複数指定も可能。
+          schema:
+            $ref: '#/components/schemas/EnumTypeNames'
+        - in: query
+          name: srsName
+          required: true
+          description: '"EPSG:4326"（世界測地系）を指定する。'
+          schema:
+            type: string
+            enum:
+              - EPSG:4326
+        - in: query
+          name: outputFormat
+          required: true
+          description: |
+            レスポンスの形式を指定する。
+            "application/json" を指定した場合は GeoJSON 形式、"csv" を指定した場合は CSV 形式となる。
+            本仕様書では "application/json"（GeoJSON）のレスポンスを定義する。
+          schema:
+            type: string
+            enum:
+              - application/json
+              - csv
+        - in: query
+          name: exceptions
+          required: false
+          description: |
+            エラーレスポンスの形式を指定する。
+            "application/json" を指定した場合は JSON 形式、未指定時は XML 形式となる。
+          schema:
+            type: string
+            enum:
+              - application/json
+        - in: query
+          name: cql_filter
+          required: true
+          description: |
+            CQL フィルタ。次の項目を AND 条件で連結して指定する。
+            道路種別（必須）は高速自動車国道なら 1、一般国道なら 3 を `"道路種別"='3'` の形式で指定する。
+            時間コード（必須）は `"時間コード"=YYYYMMDDhhmm` で指定する。範囲指定は `"時間コード">=... AND "時間コード"<=...` の形式とする。5 分値は分を 5 の倍数へ切り捨てる。1 時間値は分を 00 へ切り捨てる。
+            座標指定（任意）は BBOX 関数で緯度経度の範囲を絞り込む。書式は下部の例を参照する。
+            常時観測点コード（任意）は `"常時観測点コード"=01234567` のように 0 埋めで指定する。
+          schema:
+            type: string
+            example: '"道路種別"=''3'' AND "時間コード"=202502100900 AND BBOX("ジオメトリ",139.15,35.141,139.32,35.56,''EPSG:4326'')'
+      responses:
+        '200':
+          description: |
+            処理成功時。GeoJSON FeatureCollection を返す。
+            合致する計測箇所が存在しない場合も 200 で返り、features は空配列となる。
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResponseFeatureCollection'
+              examples:
+                format1:
+                  summary: 様式 1（常設トラカン 5 分間交通量）
+                  value:
+                    type: FeatureCollection
+                    features:
+                      - type: Feature
+                        id: t_travospublic_measure_5m.4693500.202502100900
+                        geometry:
+                          type: MultiPoint
+                          coordinates:
+                            - - 139.203293
+                              - 35.37445003
+                        geometry_name: ジオメトリ
+                        properties:
+                          地方整備局等番号: 83
+                          開発建設部／都道府県コード: ''
+                          常時観測点コード: 3110640
+                          収集時間フラグ（5分間／1時間）: '1'
+                          観測年月日: 20250210
+                          時間帯: 900
+                          上り・小型交通量: 42
+                          上り・大型交通量: 5
+                          上り・車種判別不能交通量: 1
+                          上り・停電: '0'
+                          上り・ループ異常: '0'
+                          上り・超音波異常: '0'
+                          上り・欠測: '0'
+                          下り・小型交通量: 39
+                          下り・大型交通量: 6
+                          下り・車種判別不能交通量: 3
+                          下り・停電: '0'
+                          下り・ループ異常: '0'
+                          下り・超音波異常: '0'
+                          下り・欠測: '0'
+                          道路種別: '3'
+                          時間コード: 202502100900
+                    totalFeatures: 1
+                    numberMatched: 1
+                    numberReturned: 1
+                    timeStamp: '2025-03-26T10:20:44.761Z'
+                    crs:
+                      type: name
+                      properties:
+                        name: urn:ogc:def:crs:EPSG::4326
+                format2:
+                  summary: 様式 2（常設トラカン 1 時間交通量）
+                  value:
+                    type: FeatureCollection
+                    features:
+                      - type: Feature
+                        id: t_travospublic_measure_1h.4693500.202502100900
+                        geometry:
+                          type: MultiPoint
+                          coordinates:
+                            - - 139.203293
+                              - 35.37445003
+                        geometry_name: ジオメトリ
+                        properties:
+                          地方整備局等番号: 83
+                          開発建設部／都道府県コード: ''
+                          常時観測点コード: 3110640
+                          収集時間フラグ（5分間／1時間）: '2'
+                          観測年月日: 20250210
+                          時間帯: 900
+                          上り・小型交通量: 512
+                          上り・大型交通量: 68
+                          上り・車種判別不能交通量: 9
+                          上り・停電: '0'
+                          上り・ループ異常: '0'
+                          上り・超音波異常: '0'
+                          上り・欠測: '0'
+                          下り・小型交通量: 487
+                          下り・大型交通量: 71
+                          下り・車種判別不能交通量: 12
+                          下り・停電: '0'
+                          下り・ループ異常: '0'
+                          下り・超音波異常: '0'
+                          下り・欠測: '0'
+                          道路種別: '3'
+                          時間コード: 202502100900
+                    totalFeatures: 1
+                    numberMatched: 1
+                    numberReturned: 1
+                    timeStamp: '2025-03-26T10:20:44.761Z'
+                    crs:
+                      type: name
+                      properties:
+                        name: urn:ogc:def:crs:EPSG::4326
+                format3:
+                  summary: 様式 3（CCTV トラカン 5 分間交通量）
+                  value:
+                    type: FeatureCollection
+                    features:
+                      - type: Feature
+                        id: t_travospublic_measure_5m_img.5120001.202502100900
+                        geometry:
+                          type: MultiPoint
+                          coordinates:
+                            - - 136.906428
+                              - 35.181499
+                        geometry_name: ジオメトリ
+                        properties:
+                          地方整備局等番号: 85
+                          開発建設部／都道府県コード: '23'
+                          常時観測点コード: 5120001
+                          収集時間フラグ（5分間／1時間）: '1'
+                          観測年月日: 20250210
+                          時間帯: 900
+                          上り・自動車交通量（集計値）: 58
+                          上り・小型交通量（集計値）: 50
+                          上り・大型交通量（集計値）: 8
+                          上り・小型大型判別不能交通量（集計値）: 0
+                          下り・自動車交通量（集計値）: 61
+                          下り・小型交通量（集計値）: 52
+                          下り・大型交通量（集計値）: 9
+                          下り・小型大型判別不能交通量（集計値）: 0
+                          カメラプリセット位置: '0'
+                          気象影響による映像不良: '0'
+                          照度不足: '0'
+                          突発事象（交通事故等）: '0'
+                          サーバの稼働: '0'
+                          カメラの映像受信: '0'
+                          映像のデコード処理: '0'
+                          デコード映像から映像解析機能への取込加工処理の失敗: '0'
+                          映像解析機能のフリーズ: '0'
+                          その他エラー: '0'
+                          道路種別: '3'
+                          時間コード: 202502100900
+                    totalFeatures: 1
+                    numberMatched: 1
+                    numberReturned: 1
+                    timeStamp: '2025-03-26T10:20:44.761Z'
+                    crs:
+                      type: name
+                      properties:
+                        name: urn:ogc:def:crs:EPSG::4326
+                format4:
+                  summary: 様式 4（CCTV トラカン 1 時間交通量）
+                  value:
+                    type: FeatureCollection
+                    features:
+                      - type: Feature
+                        id: t_travospublic_measure_1h_img.5120001.202502100900
+                        geometry:
+                          type: MultiPoint
+                          coordinates:
+                            - - 136.906428
+                              - 35.181499
+                        geometry_name: ジオメトリ
+                        properties:
+                          地方整備局等番号: 85
+                          開発建設部／都道府県コード: '23'
+                          常時観測点コード: 5120001
+                          収集時間フラグ（5分間／1時間）: '2'
+                          観測年月日: 20250210
+                          時間帯: 9
+                          上り・自動車交通量: 712
+                          上り・小型交通量: 615
+                          上り・大型交通量: 97
+                          上り・小型大型判別不能交通量: 0
+                          上り・5分欠測処理フラグ: '2'
+                          下り・自動車交通量: 738
+                          下り・小型交通量: 628
+                          下り・大型交通量: 110
+                          下り・小型大型判別不能交通量: 0
+                          下り・5分欠測処理フラグ: '2'
+                          道路種別: '3'
+                          時間コード: 202502100900
+                    totalFeatures: 1
+                    numberMatched: 1
+                    numberReturned: 1
+                    timeStamp: '2025-03-26T10:20:44.761Z'
+                    crs:
+                      type: name
+                      properties:
+                        name: urn:ogc:def:crs:EPSG::4326
+                empty:
+                  summary: 合致 0 件。
+                  value:
+                    type: FeatureCollection
+                    features: []
+                    totalFeatures: 0
+                    numberMatched: 0
+                    numberReturned: 0
+                    timeStamp: '2024-03-25T05:47:27.415Z'
+                    crs: null
+        default:
+          description: |
+            エラー時のレスポンス。複数の形式がある。HTTP ステータスコードは形式により異なる。
+            必須パラメータの欠落は HTTP 400 で `{message}` を返す。
+            `exceptions=application/json` 指定時の WFS 例外は `{version, exceptions}` を返す（HTTP 200 のことがある）。
+            `exceptions` 未指定時は XML の ExceptionReport を返す。
+            ペイロードサイズ超過時は `{errorMessage, errorType}` を返す。
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: '#/components/schemas/ResponseErrorMessage'
+                  - $ref: '#/components/schemas/ResponseExceptionReport'
+                  - $ref: '#/components/schemas/ResponseErrorLambda'
+              examples:
+                missingParameter:
+                  summary: 必須パラメータ欠落（HTTP 400）。
+                  value:
+                    message: 'Missing required request parameters: [typeNames]'
+                exceptionJson:
+                  summary: WFS 例外（exceptions=application/json 指定時）。
+                  value:
+                    version: 2.0.0
+                    exceptions:
+                      - code: InvalidParameterValue
+                        locator: typeName
+                        text: Feature type :t_travospublic_measure_50m unknown
+                payloadTooLarge:
+                  summary: ペイロードサイズ超過。
+                  value:
+                    errorMessage: Response payload size exceeded maximum allowed payload size (6291556 bytes).
+                    errorType: Function.ResponseSizeTooLarge
+            text/xml:
+              schema:
+                type: string
+                description: WFS の ExceptionReport（XML）。exceptions 未指定時に返る。
+              examples:
+                exceptionReport:
+                  summary: データ種別の記述不正。
+                  value: |
+                    <?xml version="1.0" encoding="UTF-8"?><ows:ExceptionReport xmlns:ows="http://www.opengis.net/ows/1.1" version="2.0.0"><ows:Exception exceptionCode="InvalidParameterValue" locator="typeName"><ows:ExceptionText>Feature type :t_travospublic_measure_50m unknown</ows:ExceptionText></ows:Exception></ows:ExceptionReport>
+components:
+  schemas:
+    Crs:
+      type: object
+      description: 座標参照系（CRS）の情報。
+      required:
+        - type
+        - properties
+      properties:
+        type:
+          type: string
+          const: name
+          description: 座標参照系項目タイプ。固定値 "name"。
+        properties:
+          type: object
+          description: CRS のプロパティ。
+          required:
+            - name
+          properties:
+            name:
+              type: string
+              const: urn:ogc:def:crs:EPSG::4326
+              description: 座標参照系名称。固定値 "urn:ogc:def:crs:EPSG::4326"。
+    Feature:
+      type: object
+      description: 取得結果 1 件分のフィーチャ。計測箇所の位置情報と交通量データの組。
+      required:
+        - type
+        - geometry
+        - geometry_name
+        - properties
+      properties:
+        type:
+          type: string
+          const: Feature
+          description: 属性項目タイプ。固定値 "Feature"。
+        id:
+          type: string
+          description: 「情報種別名.一意識別子」形式の ID。例 "t_travospublic_measure_5m.4693500.202502100900"。
+        geometry:
+          $ref: '#/components/schemas/GeometryMultiPoint'
+        geometry_name:
+          type: string
+          const: ジオメトリ
+          description: ジオメトリ属性名。固定値 "ジオメトリ"。
+        properties:
+          description: 交通量データ。指定した様式（typeNames）により項目が異なる。
+          oneOf:
+            - $ref: '#/components/schemas/PropertiesFormat1'
+            - $ref: '#/components/schemas/PropertiesFormat2'
+            - $ref: '#/components/schemas/PropertiesFormat3'
+            - $ref: '#/components/schemas/PropertiesFormat4'
+    GeometryMultiPoint:
+      type: object
+      description: 観測地点の位置情報。GeoJSON の MultiPoint 形式。
+      required:
+        - type
+        - coordinates
+      properties:
+        type:
+          type: string
+          const: MultiPoint
+          description: ジオメトリオブジェクトタイプ。固定値 "MultiPoint"。
+        coordinates:
+          type: array
+          description: 観測地点を描画するための緯度経度の組合せ。各要素は[経度、 緯度]。
+          items:
+            type: array
+            minItems: 2
+            maxItems: 2
+            items:
+              type: number
+            example:
+              - 139.203293
+              - 35.37445003
+    PropertiesBase:
+      type: object
+      description: 全様式に共通する交通量データの属性。
+      properties:
+        地方整備局等番号:
+          type: integer
+          description: |
+            81:北海道、82:東北、83:関東、84:北陸、85:中部、86:近畿、87:中国、88:四国、89:九州、90:沖縄。
+        開発建設部／都道府県コード:
+          type: string
+          description: |
+            北海道・中部以外は空欄。
+            北海道は 01:札幌、02:函館、03:小樽、04:旭川、05:室蘭、06:釧路、07:帯広、08:網走、09:留萌、10:稚内。
+            中部は 21:岐阜県、22:静岡県、23:愛知県、24:三重県。
+        常時観測点コード:
+          type: integer
+          description: 常時観測点コード。
+        収集時間フラグ（5分間／1時間）:
+          type: string
+          enum:
+            - '1'
+            - '2'
+          description: 1:5 分間、2:1 時間。
+        観測年月日:
+          type: integer
+          description: YYYYMMDD で表記。
+        時間帯:
+          type: integer
+          description: 観測時刻を表す。様式 1〜3 は hhmm 形式で返す。様式 4 は時のみで 0〜23 の値となる。
+        道路種別:
+          $ref: '#/components/schemas/EnumRoadType'
+        時間コード:
+          type: integer
+          format: int64
+          description: 観測年月日+時間帯（YYYYMMDDhhmm）。
+    PropertiesFormat1:
+      allOf:
+        - $ref: '#/components/schemas/PropertiesBase'
+        - type: object
+          description: 様式 1（常設トラカン 5 分間交通量）固有の属性。
+          properties:
+            上り・小型交通量:
+              type:
+                - integer
+                - 'null'
+              description: 単位:台／5 分。欠測の場合は null。
+            上り・大型交通量:
+              type:
+                - integer
+                - 'null'
+              description: 単位:台／5 分。欠測の場合は null。
+            上り・車種判別不能交通量:
+              type:
+                - integer
+                - 'null'
+              description: 単位:台／5 分。欠測の場合は null。
+            上り・停電:
+              type: string
+              enum:
+                - '0'
+                - '1'
+              description: 0:正常、1:停電。
+            上り・ループ異常:
+              type: string
+              enum:
+                - '0'
+                - '1'
+              description: 0:正常、1:異常。
+            上り・超音波異常:
+              type: string
+              enum:
+                - '0'
+                - '1'
+              description: 0:正常、1:異常。
+            上り・欠測:
+              type: string
+              enum:
+                - '0'
+                - '1'
+              description: 0:正常、1:欠測。
+            下り・小型交通量:
+              type:
+                - integer
+                - 'null'
+              description: 単位:台／5 分。欠測の場合は null。
+            下り・大型交通量:
+              type:
+                - integer
+                - 'null'
+              description: 単位:台／5 分。欠測の場合は null。
+            下り・車種判別不能交通量:
+              type:
+                - integer
+                - 'null'
+              description: 単位:台／5 分。欠測の場合は null。
+            下り・停電:
+              type: string
+              enum:
+                - '0'
+                - '1'
+              description: 0:正常、1:停電。
+            下り・ループ異常:
+              type: string
+              enum:
+                - '0'
+                - '1'
+              description: 0:正常、1:異常。
+            下り・超音波異常:
+              type: string
+              enum:
+                - '0'
+                - '1'
+              description: 0:正常、1:異常。
+            下り・欠測:
+              type: string
+              enum:
+                - '0'
+                - '1'
+              description: 0:正常、1:欠測。
+    PropertiesFormat2:
+      allOf:
+        - $ref: '#/components/schemas/PropertiesBase'
+        - type: object
+          description: 様式 2（常設トラカン 1 時間交通量）固有の属性。
+          properties:
+            上り・小型交通量:
+              type:
+                - integer
+                - 'null'
+              description: 単位:台／時。欠測の場合は null。
+            上り・大型交通量:
+              type:
+                - integer
+                - 'null'
+              description: 単位:台／時。欠測の場合は null。
+            上り・車種判別不能交通量:
+              type:
+                - integer
+                - 'null'
+              description: 単位:台／時。欠測の場合は null。
+            上り・停電:
+              type: string
+              enum:
+                - '0'
+                - '1'
+              description: 0:正常、1:停電。
+            上り・ループ異常:
+              type: string
+              enum:
+                - '0'
+                - '1'
+              description: 0:正常、1:異常。
+            上り・超音波異常:
+              type: string
+              enum:
+                - '0'
+                - '1'
+              description: 0:正常、1:異常。
+            上り・欠測:
+              type: string
+              enum:
+                - '0'
+                - '1'
+              description: 0:正常、1:欠測。
+            下り・小型交通量:
+              type:
+                - integer
+                - 'null'
+              description: 単位:台／時。欠測の場合は null。
+            下り・大型交通量:
+              type:
+                - integer
+                - 'null'
+              description: 単位:台／時。欠測の場合は null。
+            下り・車種判別不能交通量:
+              type:
+                - integer
+                - 'null'
+              description: 単位:台／時。欠測の場合は null。
+            下り・停電:
+              type: string
+              enum:
+                - '0'
+                - '1'
+              description: 0:正常、1:停電。
+            下り・ループ異常:
+              type: string
+              enum:
+                - '0'
+                - '1'
+              description: 0:正常、1:異常。
+            下り・超音波異常:
+              type: string
+              enum:
+                - '0'
+                - '1'
+              description: 0:正常、1:異常。
+            下り・欠測:
+              type: string
+              enum:
+                - '0'
+                - '1'
+              description: 0:正常、1:欠測。
+    PropertiesFormat3:
+      allOf:
+        - $ref: '#/components/schemas/PropertiesBase'
+        - type: object
+          description: 様式 3（CCTV トラカン 5 分間交通量・画像認識型）固有の属性。
+          properties:
+            上り・自動車交通量（集計値）:
+              type:
+                - integer
+                - 'null'
+              description: 「カメラプリセット位置」が「1:異常」の場合は null。
+            上り・小型交通量（集計値）:
+              type:
+                - integer
+                - 'null'
+              description: 「カメラプリセット位置」が「1:異常」の場合は null。
+            上り・大型交通量（集計値）:
+              type:
+                - integer
+                - 'null'
+              description: 「カメラプリセット位置」が「1:異常」の場合は null。
+            上り・小型大型判別不能交通量（集計値）:
+              type:
+                - integer
+                - 'null'
+              description: 「カメラプリセット位置」が「1:異常」の場合は null。
+            下り・自動車交通量（集計値）:
+              type:
+                - integer
+                - 'null'
+              description: 「カメラプリセット位置」が「1:異常」の場合は null。
+            下り・小型交通量（集計値）:
+              type:
+                - integer
+                - 'null'
+              description: 「カメラプリセット位置」が「1:異常」の場合は null。
+            下り・大型交通量（集計値）:
+              type:
+                - integer
+                - 'null'
+              description: 「カメラプリセット位置」が「1:異常」の場合は null。
+            下り・小型大型判別不能交通量（集計値）:
+              type:
+                - integer
+                - 'null'
+              description: 「カメラプリセット位置」が「1:異常」の場合は null。
+            カメラプリセット位置:
+              type: string
+              enum:
+                - '0'
+                - '1'
+              description: 0:正常、1:異常。
+            気象影響による映像不良:
+              type: string
+              enum:
+                - '0'
+                - '1'
+                - ''
+              description: 判定可能の場合は 0:正常、1:異常。判定不能の場合は空文字。
+            照度不足:
+              type: string
+              enum:
+                - '0'
+                - '1'
+                - ''
+              description: 判定可能の場合は 0:正常、1:異常。判定不能の場合は空文字。
+            突発事象（交通事故等）:
+              type: string
+              enum:
+                - '0'
+                - '1'
+                - ''
+              description: 判定可能の場合は 0:正常、1:異常。判定不能の場合は空文字。
+            サーバの稼働:
+              type: string
+              enum:
+                - '0'
+                - '1'
+                - ''
+              description: 判定可能の場合は 0:正常、1:異常。判定不能の場合は空文字。
+            カメラの映像受信:
+              type: string
+              enum:
+                - '0'
+                - '1'
+                - ''
+              description: 判定可能の場合は 0:正常、1:異常。判定不能の場合は空文字。
+            映像のデコード処理:
+              type: string
+              enum:
+                - '0'
+                - '1'
+                - ''
+              description: 判定可能の場合は 0:正常、1:異常。判定不能の場合は空文字。
+            デコード映像から映像解析機能への取込加工処理の失敗:
+              type: string
+              enum:
+                - '0'
+                - '1'
+                - ''
+              description: 判定可能の場合は 0:正常、1:異常。判定不能の場合は空文字。
+            映像解析機能のフリーズ:
+              type: string
+              enum:
+                - '0'
+                - '1'
+                - ''
+              description: 判定可能の場合は 0:正常、1:異常。判定不能の場合は空文字。
+            その他エラー:
+              type: string
+              enum:
+                - '0'
+                - '1'
+                - ''
+              description: 判定可能の場合は 0:正常、1:異常。判定不能の場合は空文字。
+    PropertiesFormat4:
+      allOf:
+        - $ref: '#/components/schemas/PropertiesBase'
+        - type: object
+          description: 様式 4（CCTV トラカン 1 時間交通量・画像認識型）固有の属性。
+          properties:
+            上り・自動車交通量:
+              type:
+                - integer
+                - 'null'
+              description: 単位:台／時。欠測・カメラ異常の場合は null。
+            上り・小型交通量:
+              type:
+                - integer
+                - 'null'
+              description: 単位:台／時。欠測・カメラ異常の場合は null。
+            上り・大型交通量:
+              type:
+                - integer
+                - 'null'
+              description: 単位:台／時。欠測・カメラ異常の場合は null。
+            上り・小型大型判別不能交通量:
+              type:
+                - integer
+                - 'null'
+              description: 単位:台／時。欠測・カメラ異常の場合は null。
+            上り・5分欠測処理フラグ:
+              type: string
+              enum:
+                - '0'
+                - '1'
+                - '2'
+              description: 1:5 分処理、2:1 時間。0 も返るが仕様書に記載なし。
+            下り・自動車交通量:
+              type:
+                - integer
+                - 'null'
+              description: 単位:台／時。欠測・カメラ異常の場合は null。
+            下り・小型交通量:
+              type:
+                - integer
+                - 'null'
+              description: 単位:台／時。欠測・カメラ異常の場合は null。
+            下り・大型交通量:
+              type:
+                - integer
+                - 'null'
+              description: 単位:台／時。欠測・カメラ異常の場合は null。
+            下り・小型大型判別不能交通量:
+              type:
+                - integer
+                - 'null'
+              description: 単位:台／時。欠測・カメラ異常の場合は null。
+            下り・5分欠測処理フラグ:
+              type: string
+              enum:
+                - '0'
+                - '1'
+                - '2'
+              description: 1:5 分処理、2:1 時間。0 も返るが仕様書に記載なし。
+    EnumRoadType:
+      type: string
+      description: 道路種別。常時観測点に紐づくコード。1:高速自動車国道、3:一般国道。
+      enum:
+        - '1'
+        - '3'
+    EnumTypeNames:
+      type: string
+      description: |
+        取得対象のレイヤ名（様式）。typeNames に指定する。
+        - `t_travospublic_measure_5m`: 様式 1 常設トラカン 5 分間交通量
+        - `t_travospublic_measure_1h`: 様式 2 常設トラカン 1 時間交通量
+        - `t_travospublic_measure_5m_img`: 様式 3 CCTV トラカン 5 分間交通量（画像認識型）
+        - `t_travospublic_measure_1h_img`: 様式 4 CCTV トラカン 1 時間交通量（画像認識型）
+      enum:
+        - t_travospublic_measure_5m
+        - t_travospublic_measure_1h
+        - t_travospublic_measure_5m_img
+        - t_travospublic_measure_1h_img
+    ResponseErrorLambda:
+      type: object
+      description: |
+        レスポンスのペイロードサイズ超過などで返る JSON 形式のエラー（基盤の Lambda 由来）。
+        期間や範囲を狭めて再リクエストする必要がある。
+      required:
+        - errorMessage
+        - errorType
+      properties:
+        errorMessage:
+          type: string
+          description: |
+            エラーメッセージ。
+            例 "Response payload size exceeded maximum allowed payload size (6291556 bytes)."。
+        errorType:
+          type: string
+          description: エラー種別。例 "Function.ResponseSizeTooLarge"。
+    ResponseErrorMessage:
+      type: object
+      description: |
+        必須パラメータの欠落など、リクエスト記述の不備で返る JSON 形式のエラー。
+      required:
+        - message
+      properties:
+        message:
+          type: string
+          description: 'エラーメッセージ。例 "Missing required request parameters: [typeNames]"。'
+    ResponseExceptionReport:
+      type: object
+      description: |
+        `exceptions=application/json` を指定したときに返る WFS 例外。HTTP ステータスは 200 で返ることがある。
+      required:
+        - version
+        - exceptions
+      properties:
+        version:
+          type: string
+          description: WFS バージョン。例 "2.0.0"。
+        exceptions:
+          type: array
+          description: 発生した例外の配列。
+          items:
+            type: object
+            required:
+              - code
+              - text
+            properties:
+              code:
+                type: string
+                description: 例外コード。例 "InvalidParameterValue"。
+              locator:
+                type: string
+                description: 例外の対象。例 "typeName"。
+              text:
+                type: string
+                description: 例外メッセージ。
+    ResponseFeatureCollection:
+      type: object
+      description: |
+        WFS GetFeature のレスポンス。GeoJSON FeatureCollection 形式。
+        リクエストに合致する計測箇所が存在しない場合も HTTP 200 で返り、features は空配列、crs は null となる。
+      required:
+        - type
+        - features
+        - totalFeatures
+        - numberMatched
+        - numberReturned
+        - timeStamp
+      properties:
+        type:
+          type: string
+          const: FeatureCollection
+          description: GeoJSON オブジェクトタイプ。固定値 "FeatureCollection"。
+        features:
+          type: array
+          description: 取得した結果（n 件）を格納する。
+          items:
+            $ref: '#/components/schemas/Feature'
+        totalFeatures:
+          type: integer
+          description: レスポンス対象となったデータのシステム管理用件数。
+        numberMatched:
+          type: integer
+          description: リクエストに一致した件数。
+        numberReturned:
+          type: integer
+          description: 返却した件数。計測箇所および交通量データ一式を 1 としてカウントする。
+        timeStamp:
+          type: string
+          format: date-time
+          description: リクエストを処理した日時。
+        crs:
+          description: 座標参照系。合致する計測箇所が存在しない場合は null。
+          oneOf:
+            - $ref: '#/components/schemas/Crs'
+            - type: 'null'
