@@ -1,5 +1,6 @@
 type: object
-description: 観測地点の位置情報。GeoJSON の MultiPoint 形式。
+description:
+  $ref: "./descriptions/GeometryMultiPoint.md"
 required:
   - type
   - coordinates

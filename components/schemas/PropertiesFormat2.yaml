@@ -1,4 +1,5 @@
-description: 様式 2（常設トラカン 1 時間交通量）の属性。
+description:
+  $ref: "./descriptions/PropertiesFormat2.md"
 allOf:
   - $ref: ./PropertiesBase.yaml
   - type: object

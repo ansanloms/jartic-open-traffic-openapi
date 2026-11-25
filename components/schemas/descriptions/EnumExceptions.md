@@ -1,0 +1,1 @@
+エラーレスポンスの形式。"application/json" は JSON 形式、未指定時は XML 形式となる。

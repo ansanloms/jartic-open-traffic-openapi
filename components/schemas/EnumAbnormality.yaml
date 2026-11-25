@@ -1,5 +1,6 @@
 type: string
-description: 0:正常、1:異常。
+description:
+  $ref: "./descriptions/EnumAbnormality.md"
 enum:
   - "0"
   - "1"

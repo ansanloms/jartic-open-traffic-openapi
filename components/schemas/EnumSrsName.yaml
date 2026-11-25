@@ -1,4 +1,5 @@
 type: string
-description: '"EPSG:4326"（世界測地系）を指定する。'
+description:
+  $ref: "./descriptions/EnumSrsName.md"
 enum:
   - "EPSG:4326"

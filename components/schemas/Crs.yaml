@@ -1,5 +1,6 @@
 type: object
-description: 座標参照系（CRS）の情報。
+description:
+  $ref: "./descriptions/Crs.md"
 required:
   - type
   - properties

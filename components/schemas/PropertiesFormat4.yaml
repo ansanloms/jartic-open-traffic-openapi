@@ -1,4 +1,5 @@
-description: 様式 4（CCTV トラカン 1 時間交通量・画像認識型）の属性。
+description:
+  $ref: "./descriptions/PropertiesFormat4.md"
 allOf:
   - $ref: ./PropertiesBase.yaml
   - type: object

@@ -1,4 +1,5 @@
 type: string
-description: '"2.0.0" を指定する。'
+description:
+  $ref: "./descriptions/EnumVersion.md"
 enum:
   - "2.0.0"

@@ -1,5 +1,6 @@
 type: string
-description: 0:正常、1:停電。
+description:
+  $ref: "./descriptions/EnumPowerFailure.md"
 enum:
   - "0"
   - "1"

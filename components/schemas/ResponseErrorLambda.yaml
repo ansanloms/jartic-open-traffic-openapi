@@ -1,7 +1,6 @@
 type: object
-description: |
-  レスポンスのペイロードサイズ超過などで返る JSON 形式のエラー（基盤の Lambda 由来）。
-  期間や範囲を狭めて再リクエストする必要がある。
+description:
+  $ref: "./descriptions/ResponseErrorLambda.md"
 required:
   - errorMessage
   - errorType
