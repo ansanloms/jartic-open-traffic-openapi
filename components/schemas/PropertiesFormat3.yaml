@@ -1,3 +1,4 @@
+description: 様式 3（CCTV トラカン 5 分間交通量・画像認識型）の属性。
 allOf:
   - $ref: ./PropertiesBase.yaml
   - type: object
@@ -28,42 +29,32 @@ allOf:
         type: [integer, "null"]
         description: 「カメラプリセット位置」が「1:異常」の場合は null。
       "カメラプリセット位置":
-        type: string
-        enum: ["0", "1"]
+        $ref: ./EnumAbnormality.yaml
         description: 0:正常、1:異常。
       "気象影響による映像不良":
-        type: string
-        enum: ["0", "1", ""]
+        $ref: ./EnumAbnormalityOrUndetermined.yaml
         description: 判定可能の場合は 0:正常、1:異常。判定不能の場合は空文字。
       "照度不足":
-        type: string
-        enum: ["0", "1", ""]
+        $ref: ./EnumAbnormalityOrUndetermined.yaml
         description: 判定可能の場合は 0:正常、1:異常。判定不能の場合は空文字。
       "突発事象（交通事故等）":
-        type: string
-        enum: ["0", "1", ""]
+        $ref: ./EnumAbnormalityOrUndetermined.yaml
         description: 判定可能の場合は 0:正常、1:異常。判定不能の場合は空文字。
       "サーバの稼働":
-        type: string
-        enum: ["0", "1", ""]
+        $ref: ./EnumAbnormalityOrUndetermined.yaml
         description: 判定可能の場合は 0:正常、1:異常。判定不能の場合は空文字。
       "カメラの映像受信":
-        type: string
-        enum: ["0", "1", ""]
+        $ref: ./EnumAbnormalityOrUndetermined.yaml
         description: 判定可能の場合は 0:正常、1:異常。判定不能の場合は空文字。
       "映像のデコード処理":
-        type: string
-        enum: ["0", "1", ""]
+        $ref: ./EnumAbnormalityOrUndetermined.yaml
         description: 判定可能の場合は 0:正常、1:異常。判定不能の場合は空文字。
       "デコード映像から映像解析機能への取込加工処理の失敗":
-        type: string
-        enum: ["0", "1", ""]
+        $ref: ./EnumAbnormalityOrUndetermined.yaml
         description: 判定可能の場合は 0:正常、1:異常。判定不能の場合は空文字。
       "映像解析機能のフリーズ":
-        type: string
-        enum: ["0", "1", ""]
+        $ref: ./EnumAbnormalityOrUndetermined.yaml
         description: 判定可能の場合は 0:正常、1:異常。判定不能の場合は空文字。
       "その他エラー":
-        type: string
-        enum: ["0", "1", ""]
+        $ref: ./EnumAbnormalityOrUndetermined.yaml
         description: 判定可能の場合は 0:正常、1:異常。判定不能の場合は空文字。

@@ -1,3 +1,4 @@
+description: 様式 4（CCTV トラカン 1 時間交通量・画像認識型）の属性。
 allOf:
   - $ref: ./PropertiesBase.yaml
   - type: object
@@ -16,8 +17,7 @@ allOf:
         type: [integer, "null"]
         description: 単位:台／時。欠測・カメラ異常の場合は null。
       "上り・5分欠測処理フラグ":
-        type: string
-        enum: ["0", "1", "2"]
+        $ref: ./EnumFiveMinuteMissingProcessingFlag.yaml
         description: 1:5 分処理、2:1 時間。0 も返るが仕様書に記載なし。
       "下り・自動車交通量":
         type: [integer, "null"]
@@ -32,6 +32,5 @@ allOf:
         type: [integer, "null"]
         description: 単位:台／時。欠測・カメラ異常の場合は null。
       "下り・5分欠測処理フラグ":
-        type: string
-        enum: ["0", "1", "2"]
+        $ref: ./EnumFiveMinuteMissingProcessingFlag.yaml
         description: 1:5 分処理、2:1 時間。0 も返るが仕様書に記載なし。

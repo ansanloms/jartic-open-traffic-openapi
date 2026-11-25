@@ -28,14 +28,42 @@ components:
       $ref: ./components/schemas/PropertiesFormat3.yaml
     PropertiesFormat4:
       $ref: ./components/schemas/PropertiesFormat4.yaml
+    EnumAbnormality:
+      $ref: ./components/schemas/EnumAbnormality.yaml
+    EnumAbnormalityOrUndetermined:
+      $ref: ./components/schemas/EnumAbnormalityOrUndetermined.yaml
+    EnumCollectionTimeFlag:
+      $ref: ./components/schemas/EnumCollectionTimeFlag.yaml
+    EnumExceptions:
+      $ref: ./components/schemas/EnumExceptions.yaml
+    EnumFiveMinuteMissingProcessingFlag:
+      $ref: ./components/schemas/EnumFiveMinuteMissingProcessingFlag.yaml
+    EnumMissing:
+      $ref: ./components/schemas/EnumMissing.yaml
+    EnumOutputFormat:
+      $ref: ./components/schemas/EnumOutputFormat.yaml
+    EnumPowerFailure:
+      $ref: ./components/schemas/EnumPowerFailure.yaml
+    EnumRequest:
+      $ref: ./components/schemas/EnumRequest.yaml
     EnumRoadType:
       $ref: ./components/schemas/EnumRoadType.yaml
+    EnumService:
+      $ref: ./components/schemas/EnumService.yaml
+    EnumSrsName:
+      $ref: ./components/schemas/EnumSrsName.yaml
     EnumTypeNames:
       $ref: ./components/schemas/EnumTypeNames.yaml
+    EnumVersion:
+      $ref: ./components/schemas/EnumVersion.yaml
+    ResponseErrorJson:
+      $ref: ./components/schemas/ResponseErrorJson.yaml
     ResponseErrorLambda:
       $ref: ./components/schemas/ResponseErrorLambda.yaml
     ResponseErrorMessage:
       $ref: ./components/schemas/ResponseErrorMessage.yaml
+    ResponseErrorXml:
+      $ref: ./components/schemas/ResponseErrorXml.yaml
     ResponseExceptionReport:
       $ref: ./components/schemas/ResponseExceptionReport.yaml
     ResponseFeatureCollection:

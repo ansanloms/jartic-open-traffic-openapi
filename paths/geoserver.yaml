@@ -11,25 +11,19 @@ get:
       required: true
       description: '"WFS" を指定する。'
       schema:
-        type: string
-        enum:
-          - WFS
+        $ref: ../components/schemas/EnumService.yaml
     - in: query
       name: version
       required: true
       description: '"2.0.0" を指定する。'
       schema:
-        type: string
-        enum:
-          - "2.0.0"
+        $ref: ../components/schemas/EnumVersion.yaml
     - in: query
       name: request
       required: true
       description: '"GetFeature" を指定する。'
       schema:
-        type: string
-        enum:
-          - GetFeature
+        $ref: ../components/schemas/EnumRequest.yaml
     - in: query
       name: typeNames
       required: true
@@ -41,9 +35,7 @@ get:
       required: true
       description: '"EPSG:4326"（世界測地系）を指定する。'
       schema:
-        type: string
-        enum:
-          - "EPSG:4326"
+        $ref: ../components/schemas/EnumSrsName.yaml
     - in: query
       name: outputFormat
       required: true
@@ -52,10 +44,7 @@ get:
         "application/json" を指定した場合は GeoJSON 形式、"csv" を指定した場合は CSV 形式となる。
         本仕様書では "application/json"（GeoJSON）のレスポンスを定義する。
       schema:
-        type: string
-        enum:
-          - application/json
-          - csv
+        $ref: ../components/schemas/EnumOutputFormat.yaml
     - in: query
       name: exceptions
       required: false
@@ -63,9 +52,7 @@ get:
         エラーレスポンスの形式を指定する。
         "application/json" を指定した場合は JSON 形式、未指定時は XML 形式となる。
       schema:
-        type: string
-        enum:
-          - application/json
+        $ref: ../components/schemas/EnumExceptions.yaml
     - in: query
       name: cql_filter
       required: true
@@ -120,10 +107,7 @@ get:
       content:
         application/json:
           schema:
-            oneOf:
-              - $ref: ../components/schemas/ResponseErrorMessage.yaml
-              - $ref: ../components/schemas/ResponseExceptionReport.yaml
-              - $ref: ../components/schemas/ResponseErrorLambda.yaml
+            $ref: ../components/schemas/ResponseErrorJson.yaml
           examples:
             missingParameter:
               summary: 必須パラメータ欠落（HTTP 400）。
@@ -139,8 +123,7 @@ get:
                 $ref: ../examples/ResponseErrorLambda/default.yaml
         text/xml:
           schema:
-            type: string
-            description: WFS の ExceptionReport（XML）。exceptions 未指定時に返る。
+            $ref: ../components/schemas/ResponseErrorXml.yaml
           examples:
             exceptionReport:
               summary: データ種別の記述不正。

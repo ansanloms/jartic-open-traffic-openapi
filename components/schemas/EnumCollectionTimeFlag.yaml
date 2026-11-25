@@ -1,0 +1,5 @@
+type: string
+description: 1:5 分間、2:1 時間。
+enum:
+  - "1"
+  - "2"

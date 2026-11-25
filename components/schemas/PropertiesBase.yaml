@@ -15,10 +15,7 @@ properties:
     type: integer
     description: 常時観測点コード。
   "収集時間フラグ（5分間／1時間）":
-    type: string
-    enum:
-      - "1"
-      - "2"
+    $ref: ./EnumCollectionTimeFlag.yaml
     description: 1:5 分間、2:1 時間。
   "観測年月日":
     type: integer
