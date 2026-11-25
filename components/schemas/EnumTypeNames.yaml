@@ -1,10 +1,6 @@
 type: string
-description: |
-  取得対象のレイヤ名（様式）。typeNames に指定する。
-  - `t_travospublic_measure_5m`: 様式 1 常設トラカン 5 分間交通量
-  - `t_travospublic_measure_1h`: 様式 2 常設トラカン 1 時間交通量
-  - `t_travospublic_measure_5m_img`: 様式 3 CCTV トラカン 5 分間交通量（画像認識型）
-  - `t_travospublic_measure_1h_img`: 様式 4 CCTV トラカン 1 時間交通量（画像認識型）
+description:
+  $ref: "./descriptions/EnumTypeNames.md"
 enum:
   - t_travospublic_measure_5m
   - t_travospublic_measure_1h

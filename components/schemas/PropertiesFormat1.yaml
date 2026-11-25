@@ -1,4 +1,5 @@
-description: 様式 1（常設トラカン 5 分間交通量）の属性。
+description:
+  $ref: "./descriptions/PropertiesFormat1.md"
 allOf:
   - $ref: ./PropertiesBase.yaml
   - type: object

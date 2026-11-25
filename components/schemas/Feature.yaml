@@ -1,5 +1,6 @@
 type: object
-description: 取得結果 1 件分のフィーチャ。計測箇所の位置情報と交通量データの組。
+description:
+  $ref: "./descriptions/Feature.md"
 required:
   - type
   - geometry

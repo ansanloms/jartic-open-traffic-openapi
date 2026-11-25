@@ -1,5 +1,6 @@
 type: string
-description: 0:正常、1:欠測。
+description:
+  $ref: "./descriptions/EnumMissing.md"
 enum:
   - "0"
   - "1"

@@ -1,5 +1,6 @@
 type: string
-description: 1:5 分間、2:1 時間。
+description:
+  $ref: "./descriptions/EnumCollectionTimeFlag.md"
 enum:
   - "1"
   - "2"

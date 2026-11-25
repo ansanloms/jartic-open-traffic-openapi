@@ -1,4 +1,5 @@
-description: エラーレスポンス（JSON）。
+description:
+  $ref: "./descriptions/ResponseErrorJson.md"
 oneOf:
   - $ref: ./ResponseErrorMessage.yaml
   - $ref: ./ResponseExceptionReport.yaml

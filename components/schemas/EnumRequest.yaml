@@ -1,4 +1,5 @@
 type: string
-description: '"GetFeature" を指定する。'
+description:
+  $ref: "./descriptions/EnumRequest.md"
 enum:
   - "GetFeature"

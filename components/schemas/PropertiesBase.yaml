@@ -1,5 +1,6 @@
 type: object
-description: 全様式に共通する交通量データの属性。
+description:
+  $ref: "./descriptions/PropertiesBase.md"
 properties:
   "地方整備局等番号":
     type: integer

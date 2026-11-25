@@ -1,4 +1,5 @@
 type: string
-description: '"WFS" を指定する。'
+description:
+  $ref: "./descriptions/EnumService.md"
 enum:
   - "WFS"

@@ -1,6 +1,6 @@
 type: object
-description: |
-  必須パラメータの欠落など、リクエスト記述の不備で返る JSON 形式のエラー。
+description:
+  $ref: "./descriptions/ResponseErrorMessage.md"
 required:
   - message
 properties:
