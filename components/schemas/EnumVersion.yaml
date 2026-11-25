@@ -1,0 +1,4 @@
+type: string
+description: '"2.0.0" を指定する。'
+enum:
+  - "2.0.0"

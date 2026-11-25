@@ -1,3 +1,4 @@
+description: 様式 2（常設トラカン 1 時間交通量）の属性。
 allOf:
   - $ref: ./PropertiesBase.yaml
   - type: object
@@ -13,20 +14,16 @@ allOf:
         type: [integer, "null"]
         description: 単位:台／時。欠測の場合は null。
       "上り・停電":
-        type: string
-        enum: ["0", "1"]
+        $ref: ./EnumPowerFailure.yaml
         description: 0:正常、1:停電。
       "上り・ループ異常":
-        type: string
-        enum: ["0", "1"]
+        $ref: ./EnumAbnormality.yaml
         description: 0:正常、1:異常。
       "上り・超音波異常":
-        type: string
-        enum: ["0", "1"]
+        $ref: ./EnumAbnormality.yaml
         description: 0:正常、1:異常。
       "上り・欠測":
-        type: string
-        enum: ["0", "1"]
+        $ref: ./EnumMissing.yaml
         description: 0:正常、1:欠測。
       "下り・小型交通量":
         type: [integer, "null"]
@@ -38,18 +35,14 @@ allOf:
         type: [integer, "null"]
         description: 単位:台／時。欠測の場合は null。
       "下り・停電":
-        type: string
-        enum: ["0", "1"]
+        $ref: ./EnumPowerFailure.yaml
         description: 0:正常、1:停電。
       "下り・ループ異常":
-        type: string
-        enum: ["0", "1"]
+        $ref: ./EnumAbnormality.yaml
         description: 0:正常、1:異常。
       "下り・超音波異常":
-        type: string
-        enum: ["0", "1"]
+        $ref: ./EnumAbnormality.yaml
         description: 0:正常、1:異常。
       "下り・欠測":
-        type: string
-        enum: ["0", "1"]
+        $ref: ./EnumMissing.yaml
         description: 0:正常、1:欠測。

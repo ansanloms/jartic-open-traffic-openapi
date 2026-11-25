@@ -1,0 +1,5 @@
+description: エラーレスポンス（JSON）。
+oneOf:
+  - $ref: ./ResponseErrorMessage.yaml
+  - $ref: ./ResponseExceptionReport.yaml
+  - $ref: ./ResponseErrorLambda.yaml

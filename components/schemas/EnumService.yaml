@@ -1,0 +1,4 @@
+type: string
+description: '"WFS" を指定する。'
+enum:
+  - "WFS"

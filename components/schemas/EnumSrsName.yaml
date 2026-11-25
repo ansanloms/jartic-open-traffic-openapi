@@ -1,0 +1,4 @@
+type: string
+description: '"EPSG:4326"（世界測地系）を指定する。'
+enum:
+  - "EPSG:4326"

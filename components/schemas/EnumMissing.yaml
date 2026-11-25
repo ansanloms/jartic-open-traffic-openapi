@@ -1,0 +1,5 @@
+type: string
+description: 0:正常、1:欠測。
+enum:
+  - "0"
+  - "1"

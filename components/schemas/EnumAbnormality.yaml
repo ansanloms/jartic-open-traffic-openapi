@@ -1,0 +1,5 @@
+type: string
+description: 0:正常、1:異常。
+enum:
+  - "0"
+  - "1"
